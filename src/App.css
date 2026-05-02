@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   background: var(--bg-secondary);
 }
 
@@ -15,6 +16,9 @@
   flex-shrink: 0;
   -webkit-app-region: drag;
   user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 /* ---------- browser header (non-electron) ---------- */
@@ -27,6 +31,9 @@
   color: #fff;
   flex-shrink: 0;
   user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .header-left {
@@ -180,6 +187,7 @@
 .chat {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
@@ -385,6 +393,9 @@
   border-top: 1px solid var(--border);
   background: var(--bg-secondary);
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 .input-area textarea {
