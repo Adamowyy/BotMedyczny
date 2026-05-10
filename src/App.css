@@ -403,12 +403,10 @@
   display: flex;
   gap: 10px;
   padding: 16px 24px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   background: var(--bg-secondary);
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
 }
 
 .input-area textarea {
@@ -694,4 +692,10 @@
 
 [data-theme="dark"] .setup-btn:disabled {
   background: #4b5563;
+}
+
+@media (max-width: 640px) {
+  .input-area textarea {
+    font-size: 16px;
+  }
 }
