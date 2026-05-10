@@ -29,6 +29,11 @@ function EmptyState() {
         diagnostyka. Odpowiadam wyłącznie na podstawie wiarygodnych
         źródeł medycznych, bez spekulacji.
       </p>
+      <div className="slow-notice">
+        Czasem odpisuję wolniej, bo stawiam na dokładność. 
+        Zaawansowany model, z którego korzystam, działa trochę jak lekarz przy diagnozie
+        – pośpiech nie jest tu wskazany.
+      </div>
     </div>
   );
 }
@@ -124,6 +129,13 @@ export default function App() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
+        if (res.status === 401 || res.status === 403) {
+          localStorage.removeItem('deepseek_api_key');
+          setApiKeyState('');
+          setMessages([]);
+          setKeyError('Klucz API jest nieprawidłowy lub wygasł. Wprowadź nowy klucz.');
+          return;
+        }
         throw new Error(err.error || `Błąd serwera (${res.status})`);
       }
 
@@ -204,10 +216,12 @@ export default function App() {
             {loading && <TypingDots />}
           </div>
 
-          <div className="disclaimer">
-            ⚠️ Ten asystent AI nie zastępuje konsultacji z lekarzem. Informacje mają charakter edukacyjny.<br />
-            Asystent w pełni zaprojektowany przez - Adam Warzecha / © 2026 Wszelkie prawa zastrzeżone.
-          </div>
+          {messages.length === 0 && (
+            <div className="disclaimer">
+              ⚠️ Ten asystent AI nie zastępuje konsultacji z lekarzem. Informacje mają charakter edukacyjny.<br />
+              Asystent w pełni zaprojektowany przez - Adam Warzecha / © 2026 Wszelkie prawa zastrzeżone.
+            </div>
+          )}
 
           <div className="input-area">
             <textarea

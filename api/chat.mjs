@@ -56,7 +56,7 @@ export default async function handler(req, res) {
     }
 
     const payload = {
-      model: 'deepseek-v4-flash',
+      model: 'deepseek-v4-pro',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         ...messages,
