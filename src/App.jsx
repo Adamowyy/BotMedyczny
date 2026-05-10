@@ -193,7 +193,8 @@ export default function App() {
               Zapisz i uruchom
             </button>
             <span className="setup-hint">
-              Jeśli nie masz swojego klucza, zapytaj właściciela bota czyli Adama W.
+              Jeśli nie masz swojego klucza, zapytaj właściciela bota czyli{' '}
+              <a href="https://adamowy.vercel.app" target="_blank" rel="noopener noreferrer">Adama W</a>.
             </span>
           </div>
         </div>
@@ -218,8 +219,10 @@ export default function App() {
 
           {messages.length === 0 && (
             <div className="disclaimer">
-              ⚠️ Ten asystent AI nie zastępuje konsultacji z lekarzem. Informacje mają charakter edukacyjny.<br />
-              Asystent w pełni zaprojektowany przez - Adam Warzecha / © 2026 Wszelkie prawa zastrzeżone.
+            ⚠️ Ten asystent AI nie zastępuje konsultacji z lekarzem. Informacje mają charakter edukacyjny.<br />
+            Asystent w pełni zaprojektowany przez -{' '}
+            <a href="https://adamowy.vercel.app" target="_blank" rel="noopener noreferrer">Adam Warzecha</a>
+            {' '}/ © 2026 Wszelkie prawa zastrzeżone.
             </div>
           )}
 
