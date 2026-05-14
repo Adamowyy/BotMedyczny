@@ -1,0 +1,200 @@
+/* ---------- custom title bar (replaces header) ---------- */
+.titlebar {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  background: var(--accent);
+  color: #fff;
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+  user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* ---------- browser header (non-electron) ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 20px;
+  background: var(--accent);
+  color: #fff;
+  flex-shrink: 0;
+  user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.header .logo {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.header h1 {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.header .subtitle {
+  font-size: 11px;
+  opacity: 0.8;
+  white-space: nowrap;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.titlebar-drag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.titlebar .logo {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.titlebar h1 {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.titlebar .subtitle {
+  font-size: 11px;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.titlebar-center {
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
+/* ---------- new chat button ---------- */
+.new-chat-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+  -webkit-app-region: no-drag;
+}
+
+.new-chat-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- mobile new-chat below header ---------- */
+.new-chat-mobile-bar {
+  display: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.new-chat-mobile-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--accent);
+  font-size: 13px;
+  font-family: var(--font);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.new-chat-mobile-btn:hover {
+  background: #fdf2f8;
+}
+
+[data-theme="dark"] .new-chat-mobile-btn:hover {
+  background: #2a1a2e;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-btn {
+  width: 36px;
+  height: 30px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  -webkit-app-region: no-drag;
+  margin-right: 4px;
+}
+
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- window controls ---------- */
+.titlebar-controls {
+  display: flex;
+  -webkit-app-region: no-drag;
+}
+
+.win-btn {
+  width: 44px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.win-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.cls-btn:hover {
+  background: #e81123;
+  color: #fff;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 640px) {
+  .titlebar-center .new-chat-btn,
+  .header .new-chat-btn {
+    display: none;
+  }
+
+  .new-chat-mobile-bar {
+    display: block;
+  }
+}

@@ -1,0 +1,124 @@
+/* ---------- setup screen ---------- */
+.setup-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.setup-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow);
+}
+
+.setup-icon {
+  font-size: 40px;
+}
+
+.setup-card h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.setup-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.setup-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.setup-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.15s;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.setup-input:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.15);
+}
+
+.setup-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-family: var(--font);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.setup-btn:hover {
+  background: #be185d;
+}
+
+.setup-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.setup-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.setup-hint a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.setup-hint a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- dark theme overrides ---------- */
+[data-theme="dark"] .setup-error {
+  background: #451a1a;
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .setup-input {
+  background: #374151;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .setup-input::placeholder {
+  color: #6b7280;
+}
+
+[data-theme="dark"] .setup-btn:disabled {
+  background: #4b5563;
+}

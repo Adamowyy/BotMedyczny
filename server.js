@@ -1,48 +1,52 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const SYSTEM_PROMPT = require('./lib/system-prompt');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const SYSTEM_PROMPT = require("./lib/system-prompt");
 
 const PORT = process.env.PORT || 3000;
-const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
+const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 
 const app = express();
 
 app.use(cors());
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: "1mb" }));
 
-const distPath = path.join(__dirname, 'dist');
+const distPath = path.join(__dirname, "dist");
 app.use(express.static(distPath));
 
-app.post('/api/chat', async (req, res) => {
+app.post("/api/chat", async (req, res) => {
   try {
     const { messages } = req.body;
     if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Nieprawidłowe dane: wymagane pole "messages" (tablica)' });
+      return res.status(400).json({
+        error: 'Nieprawidłowe dane: wymagane pole "messages" (tablica)',
+      });
     }
 
-    const apiKey = req.headers['x-api-key'] || process.env.DEEPSEEK_API_KEY;
+    const apiKey = req.headers["x-api-key"] || process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
-      return res.status(401).json({ error: 'Brak klucza API. Wprowadź klucz DeepSeek w ekranie konfiguracji.' });
+      return res.status(401).json({
+        error:
+          "Brak klucza API. Wprowadź klucz DeepSeek w ekranie konfiguracji.",
+      });
     }
+
+    const { thinkingMode } = req.body;
 
     const payload = {
-      model: 'deepseek-v4-pro',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...messages,
-      ],
-      thinking: { type: 'disabled' },
+      model: "deepseek-v4-pro",
+      messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+      thinking: { type: thinkingMode ? "enabled" : "disabled" },
       temperature: 0.3,
       max_tokens: 4096,
     };
 
     const response = await fetch(DEEPSEEK_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
     });
@@ -50,7 +54,7 @@ app.post('/api/chat', async (req, res) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('DeepSeek API error:', data);
+      console.error("DeepSeek API error:", data);
       return res.status(response.status).json({
         error: data.error?.message || `Błąd API DeepSeek (${response.status})`,
       });
@@ -58,18 +62,18 @@ app.post('/api/chat', async (req, res) => {
 
     const content = data.choices?.[0]?.message?.content;
     if (!content) {
-      return res.status(500).json({ error: 'Pusta odpowiedź z API DeepSeek' });
+      return res.status(500).json({ error: "Pusta odpowiedź z API DeepSeek" });
     }
 
     res.json({ content });
   } catch (err) {
-    console.error('Server error:', err);
-    res.status(500).json({ error: 'Wewnętrzny błąd serwera' });
+    console.error("Server error:", err);
+    res.status(500).json({ error: "Wewnętrzny błąd serwera" });
   }
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 app.listen(PORT, () => {
