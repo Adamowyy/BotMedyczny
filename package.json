@@ -2,57 +2,26 @@
   "name": "bot-medyczny",
   "version": "1.0.0",
   "private": true,
-  "description": "Asystent AI dla studentów medycyny – Electron + Vite + React",
-  "main": "electron/main.js",
+  "description": "Asystent AI dla studentów medycyny – Vite + React",
   "scripts": {
     "dev": "concurrently -k \"node server.js\" \"vite\"",
     "build": "vite build",
-    "start": "node server.js",
-    "electron": "electron .",
-    "electron:dev": "concurrently -k \"node server.js\" \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "dist": "vite build && electron-builder --win nsis"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
-    "marked": "^15.0.4",
+    "mammoth": "^1.9.1",
+    "pdfjs-dist": "^5.4.395",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-markdown": "^9.0.1"
+    "react-markdown": "^9.0.1",
+    "turndown": "^7.2.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
-    "electron": "^33.2.1",
-    "electron-builder": "^25.1.8",
-    "vite": "^6.0.7",
-    "wait-on": "^8.0.3"
-  },
-  "build": {
-    "appId": "com.adamw.botmedyczny",
-    "productName": "AsystentMedyczny",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "server.js",
-      "electron/**/*",
-      "node_modules/**/*",
-      "package.json"
-    ],
-    "win": {
-      "target": "nsis",
-      "sign": null,
-      "signAndEditExecutable": false
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": false,
-      "createDesktopShortcut": true,
-      "artifactName": "AsystentMedyczny-Setup.exe"
-    },
-    "asar": false
+    "vite": "^6.0.7"
   }
 }

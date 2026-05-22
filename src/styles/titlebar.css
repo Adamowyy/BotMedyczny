@@ -1,19 +1,4 @@
-/* ---------- custom title bar (replaces header) ---------- */
-.titlebar {
-  display: flex;
-  align-items: center;
-  height: 40px;
-  background: var(--accent);
-  color: #fff;
-  flex-shrink: 0;
-  -webkit-app-region: drag;
-  user-select: none;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-/* ---------- browser header (non-electron) ---------- */
+/* ---------- browser header ---------- */
 .header {
   display: flex;
   align-items: center;
@@ -55,36 +40,9 @@
   margin-right: 8px;
 }
 
-.titlebar-drag {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-left: 14px;
-  flex: 1;
-  min-width: 0;
-}
-
-.titlebar .logo {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.titlebar h1 {
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.titlebar .subtitle {
-  font-size: 11px;
-  opacity: 0.8;
-  white-space: nowrap;
-}
-
 .titlebar-center {
   display: flex;
   align-items: center;
-  -webkit-app-region: no-drag;
 }
 
 /* ---------- new chat button ---------- */
@@ -149,42 +107,11 @@
   align-items: center;
   justify-content: center;
   transition: background 0.15s;
-  -webkit-app-region: no-drag;
   margin-right: 4px;
 }
 
 .theme-btn:hover {
   background: rgba(255, 255, 255, 0.3);
-}
-
-/* ---------- window controls ---------- */
-.titlebar-controls {
-  display: flex;
-  -webkit-app-region: no-drag;
-}
-
-.win-btn {
-  width: 44px;
-  height: 40px;
-  border: none;
-  background: transparent;
-  color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.1s;
-  font-family: "Segoe UI", system-ui, sans-serif;
-}
-
-.win-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.cls-btn:hover {
-  background: #e81123;
-  color: #fff;
 }
 
 /* ---------- responsive ---------- */

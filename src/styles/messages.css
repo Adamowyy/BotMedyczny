@@ -57,6 +57,27 @@
   box-shadow: var(--shadow);
 }
 
+/* ---------- file reference in user messages ---------- */
+.file-ref {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.file-ref code {
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] .file-ref code {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 /* ---------- markdown inside bubble ---------- */
 .msg.bot .bubble p {
   margin: 0 0 8px;
