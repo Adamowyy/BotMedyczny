@@ -87,3 +87,15 @@
 .typing span:nth-child(3) {
   animation-delay: 0.3s;
 }
+
+/* ---------- thinking text (random variant) ---------- */
+.typing-text {
+  color: var(--text-secondary);
+  font-style: italic;
+  animation: pulse-text 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}

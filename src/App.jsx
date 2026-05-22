@@ -4,7 +4,33 @@ import "./styles/styles.css";
 
 const api = window.electronAPI || null;
 
+const THINKING_VARIANTS = [
+  { type: "dots" },
+  { type: "text", text: "Niech pomyślę..." },
+  { type: "text", text: "Analizuję pytanie..." },
+  { type: "text", text: "Szukam odpowiedzi..." },
+  { type: "text", text: "Zaraz odpowiem..." },
+  { type: "text", text: "Chwila zastanowienia..." },
+];
+
 function TypingDots() {
+  const [variant] = useState(
+    () => THINKING_VARIANTS[Math.floor(Math.random() * THINKING_VARIANTS.length)],
+  );
+
+  if (variant.type === "text") {
+    return (
+      <div className="msg bot">
+        <div className="avatar">🤖</div>
+        <div className="bubble">
+          <div className="typing-text">
+            {variant.text} 🤔
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="msg bot">
       <div className="avatar">🤖</div>
@@ -144,6 +170,8 @@ export default function App() {
   );
   const chatRef = useRef(null);
   const inputRef = useRef(null);
+  const abortRef = useRef(null);
+  const stoppedRef = useRef(false);
 
   useEffect(() => {
     document.documentElement.setAttribute(
@@ -191,6 +219,11 @@ export default function App() {
     setMessages(updated);
     setInput("");
     setLoading(true);
+    stoppedRef.current = false;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const res = await fetch("/api/chat", {
@@ -200,6 +233,7 @@ export default function App() {
           "X-API-Key": apiKey,
         },
         body: JSON.stringify({ messages: updated, thinkingMode }),
+        signal: controller.signal,
       });
 
       if (!res.ok) {
@@ -216,17 +250,67 @@ export default function App() {
         throw new Error(err.error || `Błąd serwera (${res.status})`);
       }
 
-      const data = await res.json();
-      setMessages([...updated, { role: "assistant", content: data.content }]);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith("data:")) continue;
+
+          const data = trimmed.slice(5).trim();
+          if (!data || data === "[DONE]") continue;
+
+          try {
+            const json = JSON.parse(data);
+            const token = json.choices?.[0]?.delta?.content;
+            if (token) {
+              setMessages((prev) => {
+                const last = prev[prev.length - 1];
+                if (last && last.role === "assistant") {
+                  const copy = [...prev];
+                  copy[copy.length - 1] = { ...last, content: last.content + token };
+                  return copy;
+                }
+                return [...prev, { role: "assistant", content: token }];
+              });
+            }
+          } catch {}
+        }
+      }
     } catch (err) {
-      setMessages([
-        ...updated,
-        { role: "assistant", content: `❌ **Błąd:** ${err.message}` },
-      ]);
+      if (stoppedRef.current) return;
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last && last.role === "assistant") {
+          const copy = [...prev];
+          copy[copy.length - 1] = {
+            ...last,
+            content: last.content
+              ? last.content + `\n\n❌ **Błąd:** ${err.message}`
+              : `❌ **Błąd:** ${err.message}`,
+          };
+          return copy;
+        }
+        return [...prev, { role: "assistant", content: `❌ **Błąd:** ${err.message}` }];
+      });
     } finally {
       setLoading(false);
     }
-  }, [input, loading, messages, apiKey]);
+  }, [input, loading, messages, apiKey, thinkingMode]);
+
+  const stop = () => {
+    stoppedRef.current = true;
+    abortRef.current?.abort();
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -236,6 +320,7 @@ export default function App() {
   };
 
   const newChat = () => {
+    stop();
     if (
       messages.length > 0 &&
       !window.confirm(
@@ -332,7 +417,7 @@ export default function App() {
                 </div>
               </div>
             ))}
-            {loading && <TypingDots />}
+            {loading && messages[messages.length - 1]?.role !== "assistant" && <TypingDots />}
           </div>
 
           {messages.length === 0 && (
@@ -357,16 +442,16 @@ export default function App() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Zadaj pytanie medyczne..."
+              placeholder="Zadaj pytanie..."
               rows={1}
               disabled={loading}
             />
             <button
-              onClick={send}
-              disabled={loading || !input.trim()}
-              title="Wyślij"
+              onClick={loading ? stop : send}
+              disabled={!loading && !input.trim()}
+              title={loading ? "Zatrzymaj" : "Wyślij"}
             >
-              ↑
+              {loading ? "■" : "↑"}
             </button>
           </div>
         </>

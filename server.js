@@ -40,6 +40,7 @@ app.post("/api/chat", async (req, res) => {
       thinking: { type: thinkingMode ? "enabled" : "disabled" },
       temperature: 0.3,
       max_tokens: 4096,
+      stream: true,
     };
 
     const response = await fetch(DEEPSEEK_URL, {
@@ -51,24 +52,37 @@ app.post("/api/chat", async (req, res) => {
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      console.error("DeepSeek API error:", data);
+      const err = await response.json().catch(() => ({}));
+      console.error("DeepSeek API error:", err);
       return res.status(response.status).json({
-        error: data.error?.message || `Błąd API DeepSeek (${response.status})`,
+        error: err.error?.message || `Błąd API DeepSeek (${response.status})`,
       });
     }
 
-    const content = data.choices?.[0]?.message?.content;
-    if (!content) {
-      return res.status(500).json({ error: "Pusta odpowiedź z API DeepSeek" });
-    }
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
 
-    res.json({ content });
+    const reader = response.body.getReader();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+      }
+    } finally {
+      reader.releaseLock();
+      res.end();
+    }
   } catch (err) {
     console.error("Server error:", err);
-    res.status(500).json({ error: "Wewnętrzny błąd serwera" });
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Wewnętrzny błąd serwera" });
+    } else {
+      res.end();
+    }
   }
 });
 
