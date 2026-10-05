@@ -109,7 +109,9 @@ test("every language has a system prompt and English is the fallback", () => {
 
 test("nothing personal is shipped in the strings or the prompts", () => {
   const shipped = JSON.stringify(STRINGS) + PROMPTS.en + PROMPTS.pl;
-  for (const forbidden of ["", "studentów medycyny"]) {
+  // Split on purpose: a full-string history rewrite must not be able to empty this list.
+  const personal = ["Lau" + "rusi", "student" + "ki medycyny"];
+  for (const forbidden of personal) {
     assert.ok(
       !shipped.includes(forbidden),
       `"${forbidden}" must not appear in user-visible text`,
