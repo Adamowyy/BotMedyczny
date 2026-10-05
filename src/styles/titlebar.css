@@ -32,14 +32,6 @@
   white-space: nowrap;
 }
 
-.header .subtitle {
-  font-size: 11px;
-  opacity: 0.8;
-  white-space: nowrap;
-  margin-left: auto;
-  margin-right: 8px;
-}
-
 .titlebar-center {
   display: flex;
   align-items: center;
@@ -153,10 +145,6 @@
 @media (max-width: 640px) {
   .titlebar-center .new-chat-btn,
   .header .new-chat-btn {
-    display: none;
-  }
-
-  .header .subtitle {
     display: none;
   }
 

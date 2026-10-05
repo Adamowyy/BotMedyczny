@@ -46,6 +46,23 @@
   font-size: 12px;
 }
 
+.setup-card .setup-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+.setup-card .setup-note a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.setup-card .setup-note a:hover {
+  text-decoration: underline;
+}
+
 .setup-input {
   width: 100%;
   padding: 10px 14px;
@@ -106,4 +123,8 @@
 
 [data-theme="dark"] .setup-btn:disabled {
   background: #4b5563;
+}
+
+[data-theme="dark"] .setup-card .setup-note a {
+  color: var(--accent-light);
 }

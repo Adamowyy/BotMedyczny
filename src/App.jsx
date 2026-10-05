@@ -108,7 +108,6 @@ function Titlebar({
       <div className="header-left">
         <span className="logo">🩺</span>
         <h1>{t("app.title")}</h1>
-        <span className="subtitle">{t("app.subtitle")}</span>
       </div>
       <div className="titlebar-center">
         <div className="lang-box" title={t("lang.label")}>
@@ -660,6 +659,17 @@ export default function App() {
               placeholder={t("setup.placeholder")}
               autoFocus
             />
+            <p className="setup-note">
+              {t("setup.keyInfoA")}{" "}
+              <a
+                href="https://platform.deepseek.com/api_keys"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                platform.deepseek.com
+              </a>{" "}
+              {t("setup.keyInfoB")}
+            </p>
             <button
               className="setup-btn"
               onClick={handleSaveKey}

@@ -8,7 +8,6 @@ export const STRINGS = {
   en: {
     // header
     "app.title": "Medical Assistant",
-    "app.subtitle": "AI study assistant",
     "lang.label": "Language",
 
     // buttons
@@ -39,6 +38,8 @@ export const STRINGS = {
     "setup.title": "API key setup",
     "setup.textA": "Enter your API key to start.",
     "setup.textB": "The key is stored locally on your computer.",
+    "setup.keyInfoA": "The assistant runs on DeepSeek models and needs your own API key. Sign up at",
+    "setup.keyInfoB": "and create one in the API Keys section (a small top-up is required).",
     "setup.placeholder": "sk-xxx...xxxx",
     "setup.save": "Save and start",
 
@@ -83,7 +84,6 @@ export const STRINGS = {
   pl: {
     // header
     "app.title": "Asystent Medyczny",
-    "app.subtitle": "Asystent nauki AI",
     "lang.label": "Język",
 
     // buttons
@@ -114,6 +114,8 @@ export const STRINGS = {
     "setup.title": "Konfiguracja klucza API",
     "setup.textA": "Wprowadź swój klucz API, aby rozpocząć.",
     "setup.textB": "Klucz jest przechowywany lokalnie na Twoim komputerze.",
+    "setup.keyInfoA": "Asystent działa na modelach DeepSeek i potrzebuje własnego klucza API. Załóż konto na",
+    "setup.keyInfoB": "i wygeneruj klucz w sekcji API Keys (wymagane drobne doładowanie).",
     "setup.placeholder": "sk-xxx...xxxx",
     "setup.save": "Zapisz i uruchom",
 
