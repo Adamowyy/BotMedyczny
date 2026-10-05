@@ -2,11 +2,13 @@
   "name": "bot-medyczny",
   "version": "1.0.0",
   "private": true,
-  "description": "Asystent AI dla studentów medycyny – Vite + React",
+  "description": "Bring-your-own-key medical study assistant - React + Vite front end with an Express/Vercel API route",
+  "license": "MIT",
   "scripts": {
     "dev": "concurrently -k \"node server.js\" \"vite\"",
     "build": "vite build",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "cors": "^2.8.5",
