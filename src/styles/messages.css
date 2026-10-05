@@ -184,3 +184,27 @@
 [data-theme="dark"] .msg.bot .bubble th {
   background: #374151;
 }
+
+/* ---------- vision preview in user messages ---------- */
+.vision-preview {
+  max-width: 300px;
+  max-height: 300px;
+  border-radius: 8px;
+  object-fit: contain;
+  display: block;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+}
+
+.vision-caption {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+
+@media (max-width: 640px) {
+  .vision-preview {
+    max-width: 220px;
+    max-height: 220px;
+  }
+}
