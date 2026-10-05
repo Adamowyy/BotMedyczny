@@ -41,8 +41,6 @@ export const STRINGS = {
     "setup.textB": "The key is stored locally on your computer.",
     "setup.placeholder": "sk-xxx...xxxx",
     "setup.save": "Save and start",
-    "setup.hintA": "If you do not have a key of your own, ask the bot's owner,",
-    "setup.hintB": ".",
 
     // disclaimer
     "disclaimer.text":
@@ -118,9 +116,6 @@ export const STRINGS = {
     "setup.textB": "Klucz jest przechowywany lokalnie na Twoim komputerze.",
     "setup.placeholder": "sk-xxx...xxxx",
     "setup.save": "Zapisz i uruchom",
-    "setup.hintA":
-      "Jeśli nie masz swojego klucza, zapytaj właściciela bota czyli",
-    "setup.hintB": ".",
 
     // disclaimer
     "disclaimer.text":

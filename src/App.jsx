@@ -667,17 +667,6 @@ export default function App() {
             >
               {t("setup.save")}
             </button>
-            <span className="setup-hint">
-              {t("setup.hintA")}{" "}
-              <a
-                href="https://adamowy.vercel.app"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Adam W
-              </a>
-              {t("setup.hintB")}
-            </span>
           </div>
         </div>
       ) : (

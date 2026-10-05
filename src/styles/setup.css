@@ -88,21 +88,6 @@
   cursor: not-allowed;
 }
 
-.setup-hint {
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.setup-hint a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.setup-hint a:hover {
-  text-decoration: underline;
-}
-
 /* ---------- dark theme overrides ---------- */
 [data-theme="dark"] .setup-error {
   background: #451a1a;
