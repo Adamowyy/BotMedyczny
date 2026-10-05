@@ -1,6 +1,6 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const SYSTEM_PROMPT = require("../lib/system-prompt.js");
+const { getPrompt } = require("../lib/system-prompt.js");
 
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 
@@ -61,11 +61,11 @@ export default async function handler(req, res) {
       return;
     }
 
-    const { thinkingMode } = body;
+    const { thinkingMode, language } = body;
 
     const payload = {
       model: "deepseek-v4-pro",
-      messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+      messages: [{ role: "system", content: getPrompt(language) }, ...messages],
       thinking: { type: thinkingMode ? "enabled" : "disabled" },
       temperature: 0.3,
       max_tokens: 4096,

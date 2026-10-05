@@ -114,10 +114,49 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+/* ---------- language switcher ---------- */
+.lang-box {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  padding: 2px;
+}
+
+.lang-btn {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.lang-btn:hover {
+  opacity: 1;
+}
+
+.lang-btn.active {
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 1;
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 640px) {
   .titlebar-center .new-chat-btn,
   .header .new-chat-btn {
+    display: none;
+  }
+
+  .header .subtitle {
     display: none;
   }
 

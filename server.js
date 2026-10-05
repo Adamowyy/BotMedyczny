@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const SYSTEM_PROMPT = require("./lib/system-prompt");
+const { getPrompt } = require("./lib/system-prompt");
 
 const PORT = process.env.PORT || 3000;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -10,7 +10,7 @@ const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 const app = express();
 
 app.use(cors());
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "20mb" }));
 
 const distPath = path.join(__dirname, "dist");
 app.use(express.static(distPath));
@@ -32,11 +32,11 @@ app.post("/api/chat", async (req, res) => {
       });
     }
 
-    const { thinkingMode } = req.body;
+    const { thinkingMode, language } = req.body;
 
     const payload = {
       model: "deepseek-v4-pro",
-      messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+      messages: [{ role: "system", content: getPrompt(language) }, ...messages],
       thinking: { type: thinkingMode ? "enabled" : "disabled" },
       temperature: 0.3,
       max_tokens: 4096,

@@ -1,17 +1,23 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
+import {
+  LANGUAGES,
+  createTranslator,
+  readLanguage,
+  saveLanguage,
+} from "./i18n.mjs";
 import "./styles/styles.css";
 
 const THINKING_VARIANTS = [
   { type: "dots" },
-  { type: "text", text: "Niech pomyślę..." },
-  { type: "text", text: "Analizuję pytanie..." },
-  { type: "text", text: "Szukam odpowiedzi..." },
-  { type: "text", text: "Zaraz odpowiem..." },
-  { type: "text", text: "Chwila zastanowienia..." },
+  { type: "text", key: "thinking.v1" },
+  { type: "text", key: "thinking.v2" },
+  { type: "text", key: "thinking.v3" },
+  { type: "text", key: "thinking.v4" },
+  { type: "text", key: "thinking.v5" },
 ];
 
-function TypingDots() {
+function TypingDots({ t }) {
   const [variant] = useState(
     () => THINKING_VARIANTS[Math.floor(Math.random() * THINKING_VARIANTS.length)],
   );
@@ -22,7 +28,7 @@ function TypingDots() {
         <div className="avatar">🤖</div>
         <div className="bubble">
           <div className="typing-text">
-            {variant.text} 🤔
+            {t(variant.key)} 🤔
           </div>
         </div>
       </div>
@@ -43,26 +49,18 @@ function TypingDots() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ t }) {
   return (
     <div className="empty">
       <div className="icon">🩺</div>
-      <h2>Asystent Medyczny</h2>
-      <p>
-        Zadaj pytanie – anatomia, fizjologia, farmakologia, patologia,
-        diagnostyka. Odpowiadam wyłącznie na podstawie wiarygodnych źródeł
-        medycznych, bez spekulacji.
-      </p>
-      <div className="slow-notice">
-        Czasem odpisuję wolniej, bo stawiam na dokładność. Zaawansowany model, z
-        którego korzystam, działa trochę jak lekarz przy diagnozie – pośpiech
-        nie jest tu wskazany.
-      </div>
+      <h2>{t("empty.title")}</h2>
+      <p>{t("empty.text")}</p>
+      <div className="slow-notice">{t("empty.slowNotice")}</div>
     </div>
   );
 }
 
-function ThinkingToggle({ enabled, onToggle, disabled, className }) {
+function ThinkingToggle({ enabled, onToggle, disabled, className, t }) {
   return (
     <div
       className={`thinking-toggle-container${className ? " " + className : ""}`}
@@ -78,16 +76,16 @@ function ThinkingToggle({ enabled, onToggle, disabled, className }) {
           <span className="thinking-toggle-slider"></span>
         </div>
         <span className="thinking-toggle-text">
-          🧠 Głębokie Myślenie
+          {t("thinking.label")}
           <span className="thinking-toggle-hint">
             {enabled ? (
               <>
-                Model „myśli” przed odpowiedzią (wolniejszy)
+                {t("thinking.onA")}
                 <br />
-                ⚠️ Niezalecane do codziennego użytku!
+                {t("thinking.onB")}
               </>
             ) : (
-              "Szybsza odpowiedź bez łańcucha myślowego"
+              t("thinking.off")
             )}
           </span>
         </span>
@@ -96,28 +94,47 @@ function ThinkingToggle({ enabled, onToggle, disabled, className }) {
   );
 }
 
-function Titlebar({ messages, onNewChat, dark, onToggleTheme }) {
+function Titlebar({
+  messages,
+  onNewChat,
+  dark,
+  onToggleTheme,
+  language,
+  onLanguage,
+  t,
+}) {
   return (
     <div className="header">
       <div className="header-left">
         <span className="logo">🩺</span>
-        <h1>Asystent Medyczny</h1>
-        <span className="subtitle"></span>
+        <h1>{t("app.title")}</h1>
+        <span className="subtitle">{t("app.subtitle")}</span>
       </div>
       <div className="titlebar-center">
+        <div className="lang-box" title={t("lang.label")}>
+          {LANGUAGES.map((code) => (
+            <button
+              key={code}
+              className={`lang-btn${code === language ? " active" : ""}`}
+              onClick={() => onLanguage(code)}
+            >
+              {code.toUpperCase()}
+            </button>
+          ))}
+        </div>
         {messages.length > 0 && (
           <button
             className="new-chat-btn"
             onClick={onNewChat}
-            title="Nowy czat"
+            title={t("btn.newChatTitle")}
           >
-            + Nowy czat
+            {t("btn.newChat")}
           </button>
         )}
         <button
           className="theme-btn"
           onClick={onToggleTheme}
-          title="Zmień motyw"
+          title={t("btn.theme")}
         >
           {dark ? "☀️" : "🌙"}
         </button>
@@ -227,7 +244,9 @@ function buildTableFromItems(items) {
     merged.push(row);
   }
 
-  const dataRows = merged.filter((r) => r.cells.filter((c) => c !== "").length >= 2);
+  const dataRows = merged.filter(
+    (r) => r.cells.filter((c) => c !== "").length >= 2,
+  );
   if (dataRows.length < 2) return null;
 
   const hdr = dataRows[0];
@@ -250,6 +269,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [thinkingMode, setThinkingMode] = useState(false);
+  const [language, setLanguage] = useState(() => readLanguage(localStorage));
   const [dark, setDark] = useState(
     () => localStorage.getItem("theme") === "dark",
   );
@@ -258,9 +278,16 @@ export default function App() {
   const abortRef = useRef(null);
   const stoppedRef = useRef(false);
   const fileInputRef = useRef(null);
+  const visionInputRef = useRef(null);
 
   const [attachedFile, setAttachedFile] = useState(null);
   const [fileParsing, setFileParsing] = useState(false);
+  const [visionImage, setVisionImage] = useState(null);
+
+  const t = useCallback(
+    (key, vars) => createTranslator(language)(key, vars),
+    [language],
+  );
 
   useEffect(() => {
     document.documentElement.setAttribute(
@@ -269,6 +296,11 @@ export default function App() {
     );
     localStorage.setItem("theme", dark ? "dark" : "light");
   }, [dark]);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    saveLanguage(localStorage, language);
+  }, [language]);
 
   const toggleTheme = () => setDark((d) => !d);
 
@@ -291,7 +323,7 @@ export default function App() {
     const trimmed = keyInput.trim();
     if (!trimmed) return;
     if (!trimmed.startsWith("sk-")) {
-      setKeyError('Nieprawidłowy format. Klucz DeepSeek zaczyna się od "sk-".');
+      setKeyError(t("error.keyFormat"));
       return;
     }
     localStorage.setItem("deepseek_api_key", trimmed);
@@ -333,7 +365,9 @@ export default function App() {
             texts.push(table);
           } else {
             const sorted = [...items].sort(
-              (a, b) => a.transform[5] - b.transform[5] || a.transform[4] - b.transform[4],
+              (a, b) =>
+                a.transform[5] - b.transform[5] ||
+                a.transform[4] - b.transform[4],
             );
             texts.push(sorted.map((it) => it.str).join(" "));
           }
@@ -351,22 +385,16 @@ export default function App() {
         const turndownService = new TurndownService();
         content = turndownService.turndown(htmlResult.value);
       } else {
-        throw new Error(
-          "Nieobsługiwany format pliku. Dozwolone formaty: PDF, TXT, DOCX."
-        );
+        throw new Error(t("error.fileUnsupported"));
       }
 
       if (!content.trim()) {
-        throw new Error(
-          "Nie udało się wyodrębnić tekstu z pliku. Plik może być skanem lub obrazem bez warstwy tekstowej."
-        );
+        throw new Error(t("error.fileNoText"));
       }
 
       const MAX_CHARS = 50000;
       if (content.length > MAX_CHARS) {
-        content =
-          content.slice(0, MAX_CHARS) +
-          "\n\n[Tekst został przycięty – plik jest zbyt długi. Zadawaj pytania o konkretne fragmenty.]";
+        content = content.slice(0, MAX_CHARS) + "\n\n" + t("file.trimmed");
       }
 
       setAttachedFile({ name: file.name, content, type: file.type });
@@ -381,26 +409,100 @@ export default function App() {
 
   const removeFile = () => setAttachedFile(null);
 
+  const handleVisionSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const MAX_SIZE = 20 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      alert(t("error.imageTooLarge"));
+      e.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width;
+        let h = img.height;
+        const MAX_DIM = 2048;
+
+        if (w > MAX_DIM || h > MAX_DIM) {
+          if (w > h) {
+            h = Math.round((h / w) * MAX_DIM);
+            w = MAX_DIM;
+          } else {
+            w = Math.round((w / h) * MAX_DIM);
+            h = MAX_DIM;
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          setVisionImage({
+            name: file.name,
+            dataUrl: canvas.toDataURL(file.type || "image/png"),
+          });
+        } else {
+          setVisionImage({
+            name: file.name,
+            dataUrl: reader.result,
+          });
+        }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const removeVision = () => setVisionImage(null);
+
   const send = useCallback(async () => {
     const text = input.trim();
-    if ((!text && !attachedFile) || loading || !apiKey) return;
+    const image = visionImage;
+    if ((!text && !attachedFile && !image) || loading || !apiKey) return;
 
-    const file = attachedFile;
-    const userContent = file
-      ? `**\u{1F4C4} Plik: \`${file.name}\`**\n\n${file.content}\n\n---\n\n${text || "Przeanalizuj powyższy plik."}`
-      : text;
+    let userMsg;
 
-    const userMsg = {
-      role: "user",
-      content: userContent,
-      ...(file
-        ? { file: { name: file.name, type: file.type }, question: text || "Przeanalizuj powyższy plik." }
-        : {}),
-    };
+    if (image) {
+      // Multimodal message with vision
+      userMsg = {
+        role: "user",
+        content: [
+          { type: "text", text: text || t("prompt.analyzeImage") },
+          { type: "image_url", image_url: { url: image.dataUrl } },
+        ],
+        visionImage: { name: image.name, dataUrl: image.dataUrl },
+      };
+    } else {
+      const file = attachedFile;
+      const userContent = file
+        ? `${t("prompt.fileHeader", { name: file.name })}\n\n${
+            file.content
+          }\n\n---\n\n${text || t("prompt.analyzeFile")}`
+        : text;
+
+      userMsg = {
+        role: "user",
+        content: userContent,
+        ...(file
+          ? {
+              file: { name: file.name, type: file.type },
+              question: text || t("prompt.analyzeFile"),
+            }
+          : {}),
+      };
+    }
+
     const updated = [...messages, userMsg];
     setMessages(updated);
     setInput("");
     setAttachedFile(null);
+    setVisionImage(null);
     setLoading(true);
     stoppedRef.current = false;
 
@@ -415,7 +517,7 @@ export default function App() {
           "Content-Type": "application/json",
           "X-API-Key": apiKey,
         },
-        body: JSON.stringify({ messages: updated, thinkingMode }),
+        body: JSON.stringify({ messages: updated, thinkingMode, language }),
         signal: controller.signal,
       });
 
@@ -425,12 +527,10 @@ export default function App() {
           localStorage.removeItem("deepseek_api_key");
           setApiKeyState("");
           setMessages([]);
-          setKeyError(
-            "Klucz API jest nieprawidłowy lub wygasł. Wprowadź nowy klucz.",
-          );
+          setKeyError(t("error.keyInvalid"));
           return;
         }
-        throw new Error(err.error || `Błąd serwera (${res.status})`);
+        throw new Error(err.error || t("error.server", { status: res.status }));
       }
 
       const reader = res.body.getReader();
@@ -460,7 +560,10 @@ export default function App() {
                 const last = prev[prev.length - 1];
                 if (last && last.role === "assistant") {
                   const copy = [...prev];
-                  copy[copy.length - 1] = { ...last, content: last.content + token };
+                  copy[copy.length - 1] = {
+                    ...last,
+                    content: last.content + token,
+                  };
                   return copy;
                 }
                 return [...prev, { role: "assistant", content: token }];
@@ -478,17 +581,23 @@ export default function App() {
           copy[copy.length - 1] = {
             ...last,
             content: last.content
-              ? last.content + `\n\n❌ **Błąd:** ${err.message}`
-              : `❌ **Błąd:** ${err.message}`,
+              ? last.content + `\n\n❌ **${t("error.label")}:** ${err.message}`
+              : `❌ **${t("error.label")}:** ${err.message}`,
           };
           return copy;
         }
-        return [...prev, { role: "assistant", content: `❌ **Błąd:** ${err.message}` }];
+        return [
+          ...prev,
+          {
+            role: "assistant",
+            content: `❌ **${t("error.label")}:** ${err.message}`,
+          },
+        ];
       });
     } finally {
       setLoading(false);
     }
-  }, [input, loading, messages, apiKey, thinkingMode]);
+  }, [input, loading, messages, apiKey, thinkingMode, visionImage, t, language]);
 
   const stop = () => {
     stoppedRef.current = true;
@@ -504,13 +613,7 @@ export default function App() {
 
   const newChat = () => {
     stop();
-    if (
-      messages.length > 0 &&
-      !window.confirm(
-        "Czy na pewno chcesz rozpocząć nowy czat? Aktualna konwersacja zostanie utracona.",
-      )
-    )
-      return;
+    if (messages.length > 0 && !window.confirm(t("confirm.newChat"))) return;
     setMessages([]);
   };
 
@@ -521,12 +624,15 @@ export default function App() {
         onNewChat={newChat}
         dark={dark}
         onToggleTheme={toggleTheme}
+        language={language}
+        onLanguage={setLanguage}
+        t={t}
       />
 
       {apiKey && messages.length > 0 && (
         <div className="new-chat-mobile-bar">
           <button className="new-chat-mobile-btn" onClick={newChat}>
-            + Nowy czat
+            {t("btn.newChat")}
           </button>
         </div>
       )}
@@ -535,11 +641,11 @@ export default function App() {
         <div className="setup-screen">
           <div className="setup-card">
             <div className="setup-icon">🔑</div>
-            <h2>Konfiguracja klucza API</h2>
+            <h2>{t("setup.title")}</h2>
             <p>
-              Wprowadź swój klucz API, aby rozpocząć.
+              {t("setup.textA")}
               <br />
-              Klucz jest przechowywany lokalnie na Twoim komputerze.
+              {t("setup.textB")}
             </p>
             {keyError && <div className="setup-error">{keyError}</div>}
             <input
@@ -551,7 +657,7 @@ export default function App() {
                 setKeyError("");
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSaveKey()}
-              placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
+              placeholder={t("setup.placeholder")}
               autoFocus
             />
             <button
@@ -559,18 +665,18 @@ export default function App() {
               onClick={handleSaveKey}
               disabled={!keyInput.trim()}
             >
-              Zapisz i uruchom
+              {t("setup.save")}
             </button>
             <span className="setup-hint">
-              Jeśli nie masz swojego klucza, zapytaj właściciela bota czyli{" "}
+              {t("setup.hintA")}{" "}
               <a
                 href="https://adamowy.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Adama W
+                Adam W
               </a>
-              .
+              {t("setup.hintB")}
             </span>
           </div>
         </div>
@@ -583,13 +689,21 @@ export default function App() {
             onChange={handleFileSelect}
             style={{ display: "none" }}
           />
+          <input
+            ref={visionInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleVisionSelect}
+            style={{ display: "none" }}
+          />
           <div className="chat" ref={chatRef}>
-            {messages.length === 0 && !loading && <EmptyState />}
+            {messages.length === 0 && !loading && <EmptyState t={t} />}
             {messages.length === 0 && !loading && (
               <ThinkingToggle
                 enabled={thinkingMode}
                 onToggle={toggleThinkingMode}
                 disabled={loading}
+                t={t}
               />
             )}
             {messages.map((m, i) => (
@@ -601,9 +715,24 @@ export default function App() {
                 <div className="bubble">
                   {m.role === "assistant" ? (
                     <ReactMarkdown>{m.content}</ReactMarkdown>
+                  ) : m.visionImage ? (
+                    <>
+                      <img
+                        src={m.visionImage.dataUrl}
+                        alt={m.visionImage.name}
+                        className="vision-preview"
+                      />
+                      <div className="vision-caption">
+                        {Array.isArray(m.content)
+                          ? m.content.find((c) => c.type === "text")?.text
+                          : m.content}
+                      </div>
+                    </>
                   ) : m.file ? (
                     <>
-                      <div className="file-ref">📄 <code>{m.file.name}</code></div>
+                      <div className="file-ref">
+                        📄 <code>{m.file.name}</code>
+                      </div>
                       <div style={{ marginTop: 4 }}>{m.question}</div>
                     </>
                   ) : (
@@ -612,15 +741,16 @@ export default function App() {
                 </div>
               </div>
             ))}
-            {loading && messages[messages.length - 1]?.role !== "assistant" && <TypingDots />}
+            {loading && messages[messages.length - 1]?.role !== "assistant" && (
+              <TypingDots t={t} />
+            )}
           </div>
 
           {messages.length === 0 && (
             <div className="disclaimer">
-              ⚠️ Ten asystent AI nie zastępuje konsultacji z lekarzem.
-              Informacje mają charakter edukacyjny.
+              {t("disclaimer.text")}
               <br />
-              Asystent w pełni zaprojektowany przez -{" "}
+              {t("disclaimer.by")}{" "}
               <a
                 href="https://adamowy.vercel.app"
                 target="_blank"
@@ -628,19 +758,36 @@ export default function App() {
               >
                 Adam Warzecha
               </a>{" "}
-              / © 2026 Wszelkie prawa zastrzeżone.
+              {t("disclaimer.tail")}
             </div>
           )}
           {attachedFile && (
             <div className="file-chip-bar">
               <div className="file-chip">
-                <span className="file-chip-name">
-                  📄 {attachedFile.name}
-                </span>
+                <span className="file-chip-name">📄 {attachedFile.name}</span>
                 <button
                   className="file-chip-remove"
                   onClick={removeFile}
-                  title="Usuń plik"
+                  title={t("btn.removeFile")}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+          {visionImage && (
+            <div className="vision-chip-bar">
+              <div className="vision-chip">
+                <img
+                  src={visionImage.dataUrl}
+                  alt={visionImage.name}
+                  className="vision-chip-thumb"
+                />
+                <span className="vision-chip-name">🖼️ {visionImage.name}</span>
+                <button
+                  className="vision-chip-remove"
+                  onClick={removeVision}
+                  title={t("btn.removeImage")}
                 >
                   ✕
                 </button>
@@ -652,23 +799,33 @@ export default function App() {
               className="attach-btn"
               onClick={() => fileInputRef.current?.click()}
               disabled={loading || fileParsing}
-              title="Załącz plik (PDF, TXT, DOCX)"
+              title={t("btn.attach")}
             >
               {fileParsing ? "⏳" : "📎"}
             </button>
+            {/* VISION: the DeepSeek API does not accept images (2026-07-01).
+                The button comes back once it does. */}
+            {/* <button
+              className="vision-btn"
+              onClick={() => visionInputRef.current?.click()}
+              disabled={loading || fileParsing}
+              title={t("btn.vision")}
+            >
+              👁️
+            </button> */}
             <textarea
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Zadaj pytanie..."
+              placeholder={t("input.placeholder")}
               rows={1}
               disabled={loading}
             />
             <button
               onClick={loading ? stop : send}
               disabled={!loading && !input.trim() && !attachedFile}
-              title={loading ? "Zatrzymaj" : "Wyślij"}
+              title={loading ? t("btn.stop") : t("btn.send")}
             >
               {loading ? "■" : "↑"}
             </button>
